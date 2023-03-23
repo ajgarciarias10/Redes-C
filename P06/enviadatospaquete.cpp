@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
         (struct sockaddr *)&destino, sizeof(destino)) < 1) {
         throw runtime_error(strerror(errno));
         }
-        
+        //sendto(socket, paquete,tamaño,modificadore, destino, long_direccion)
          if(sendto(misocketenv2, &ping, sizeof(struct paquete_ping), 0,
         (struct sockaddr *)&destino, sizeof(destino)) < 1) {
         throw runtime_error(strerror(errno));
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
         struct sockaddr_in remitente;
         socklen_t remitente_longitud = sizeof(remitente);
         struct paquete_ping respuesta;
-
+        //recvfrom(socket, paquete,tamaño,modificadore, origen, long_direccion)
         if (recvfrom(misocketenv2, &respuesta, sizeof(respuesta), 0, (struct sockaddr *)&remitente, &remitente_longitud) > 0) {
             // La respuesta fue recibida, realiza las acciones necesarias
             // Puedes imprimir los datos de la respuesta recibida

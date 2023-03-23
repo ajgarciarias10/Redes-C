@@ -18,7 +18,7 @@ int main() {
     char ip[INET_ADDRSTRLEN];
     int misocket;
     // Proceso de escucha
-    // Creacion de socket
+    // Creacion de socket Protocolo ipv4 socket de tipo raw
     if ((misocket = socket(AF_INET, SOCK_RAW, IPPROTO_RAW)) == -1) {
         throw runtime_error(strerror(errno));
     }
@@ -27,6 +27,9 @@ int main() {
     if (getifaddrs(&ifaddr) == -1) {
         throw runtime_error(strerror(errno));
     }
+    /**
+     * Recorremos las interfaces de red
+     */
     for (struct ifaddrs *ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
         if (ifa->ifa_addr != NULL && ifa->ifa_addr->sa_family == AF_INET) {
         //Comparamos si el nombre interfaz es lo en caso de que no lo sea hace lo de abajo

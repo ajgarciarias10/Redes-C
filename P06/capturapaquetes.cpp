@@ -13,25 +13,28 @@ const auto ANCHO = 60;
 stringstream lineahex, lineachar;
 char punto = '.';
 for(unsigned byte = 0; byte < bytes; byte++) {
-if(byte && ! (byte % 16)) {
-cout << left << setw(ANCHO) << lineahex.str()
-<< lineachar.str() << endl;
-lineahex.str(string()); lineachar.str(string());
-}
-if(!byte || !(byte % 16))
-lineahex << setfill('0') << setw(4) << hex << byte;
-if(!(byte % 8)) lineahex << "- ";
-lineahex << setfill('0') << setw(2)
-<< hex << (int )(unsigned char) datos[byte] << " ";
-lineachar << (datos[byte] >= 32 && datos[byte] < 128
-? datos[byte] : punto);
-}
-cout << left << setw(ANCHO) << lineahex.str() << lineachar.str() << endl;
+    if(byte && ! (byte % 16)) {
+        cout << left << setw(ANCHO) << lineahex.str()
+        << lineachar.str() << endl;
+        lineahex.str(string()); lineachar.str(string());
+    }
+    if(!byte || !(byte % 16))
+        lineahex << setfill('0') << setw(4) << hex << byte;
+    if(!(byte % 8)) lineahex << "- ";
+
+        lineahex << setfill('0') << setw(2)
+        << hex << (int )(unsigned char) datos[byte] << " ";
+        lineachar << (datos[byte] >= 32 && datos[byte] < 128
+        ? datos[byte] : punto);
+    }
+    cout << left << setw(ANCHO) << lineahex.str() << lineachar.str() << endl;
 }
 //Metodo creado para examinar la cabecera ip que damos en caso de que sea TCP
 void examinaTCP(struct iphdr *cabeceraIP) {
-//OBTENEMOS LA CABECERA TCP a partir de la longuitud total de la cabecera ip
-//haciendole una conversion a formato tcp como puntero
+//OBTENEMOS la direccion de origen de memoria  de la  cabecera TCP
+//  Y se suma la
+//  direccion de memoria de la cabeceraip + la longitud de la cabecera convertido en bytes
+
   struct tcphdr *cabeceraTCP = (struct tcphdr *)(cabeceraIP + cabeceraIP->ihl * 4);
   //Obtenemos lo que contiene la cabecera tcp
   cout << "Puerto de origen: " << ntohs(cabeceraTCP->source) << endl;
@@ -44,11 +47,13 @@ void examinaTCP(struct iphdr *cabeceraIP) {
   cout << "Suma de comprobacion: " << ntohs(cabeceraTCP->check) << endl;
    /**
     * Sumamos el dataoffset del encabezado TCP especifica la longuitud del encabezado TCP en palabras de
-    * 32 bits(Multiplos de 4 bytes) luego esto sumando con la direccion de memoria de dicho encabezado, obtenemos la direccion del payload en su inicio
+    * 32 bits(Multiplos de 4 bytes) luego esto sumando con la direccion de memoria de
+    * dicho encabezado, obtenemos la direccion del payload en su inicio
     */
   char *payload = (char *)cabeceraTCP + cabeceraTCP->doff * 4;
   int longitud_paquete = ntohs(cabeceraIP->tot_len);
-  //Para obtener la longuitud de los datos se lo restamos a la longuitud del encabezado IP - TCP
+  //Para obtener la longuitud de los datos del paquete
+  // Se  hace lo restando la del paquete TCP -  longuitud del encabezado IP - TCP
   int longitud_datos = longitud_paquete - cabeceraIP->ihl * 4 - cabeceraTCP->doff * 4;
   muestra_payload(payload, longitud_datos);
 }
@@ -92,6 +97,7 @@ void examina_frame(char * paquete, size_t bytes) {
     inet_ntoa(origen) << "\t" <<
     inet_ntoa(destino) << "\t\t" <<
     "Longitud total: " << longtotal << " bytes\t" <<
+    //Conversion a 16 bytes
     "Longitud cabecera: " << (uint16_t) longcabecera << " bytes\t" <<
     "TTL: " << (uint16_t) ttl << endl;
 }
@@ -119,8 +125,5 @@ int main(int argc, char * argv[]) {
     if (origen.sll_ifindex == interfaz)
       examina_frame(paquete, bytes);
   }
-  // El código siguiente no llegará a ejecutarse
-  delete[] paquete;
-  close(misocket);
-  return 0;
+
 }
